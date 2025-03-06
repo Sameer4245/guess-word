@@ -1,0 +1,120 @@
+<script>
+let word = "";
+let wordGuess = [];
+let wrongGuess = [];
+let guessBomb = 0;
+let winCount = 1;
+let dif = 0;
+
+const randomWords = ["humor", "neha"];
+
+document.getElementById('chooseDifficulty').addEventListener('click', (e) => {
+    if (e.target.tagName === 'BUTTON') {
+        dif = parseInt(e.target.dataset.difficulty);
+        document.getElementById('startButton').style.display = 'block';
+        document.getElementById('chooseDifficulty').style.display = 'none';
+    }
+});
+
+document.getElementById('startGame').addEventListener('click', start);
+document.getElementById('enterGuess').addEventListener('click', enterGuess);
+document.getElementById('restartLose').addEventListener('click', restart);
+document.getElementById('restartWin').addEventListener('click', restart);
+
+function wordw() {
+    return randomWords[Math.floor(Math.random() * randomWords.length)];
+}
+
+function wordStart() {
+    wordGuess = Array(word.length).fill("<div class='wordBlocks'></div>");
+}
+
+function winCountFunc() {
+    return new Set(word).size;
+}
+
+function start() {
+    word = wordw();
+    winCount = winCountFunc();
+
+    if (dif === 1) {
+        guessBomb = word.length + 5;
+    } else if (dif === 2) {
+        guessBomb = word.length;
+    } else if (dif === 3) {
+        guessBomb = Math.ceil(word.length / 2);
+    }
+
+    wordStart();
+
+    document.getElementById('mainGame').style.display = 'block';
+    document.getElementById('startButton').style.display = 'none';
+    updateDisplay();
+}
+
+function enterGuess() {
+    const lett = document.getElementById("guess").value.trim().toLowerCase();
+    document.getElementById("guess").value = "";
+
+    if (lett.length === 1) {
+        if (word.includes(lett)) {
+            updateWordGuess(lett);
+        } else if (!wrongGuess.includes(lett)) {
+            wrongGuess.push(<div class='wrongWordBlocks'>${lett}</div>);
+            guessBomb -= 1;
+        }
+    } else if (lett.length > 1) {
+        guessBomb -= 1;
+    }
+
+    if (guessBomb <= 0) {
+        gameLose();
+    } else if (winCount <= 0) {
+        gameWin();
+    }
+
+    updateDisplay();
+}
+
+function updateWordGuess(letter) {
+    word.split('').forEach((char, index) => {
+        if (char === letter) {
+            wordGuess[index] = <div class='wordBlocks'>${letter}</div>;
+            winCount -= 1;
+        }
+    });
+}
+
+function updateDisplay() {
+    document.getElementById("rightGuess").innerHTML = wordGuess.join('');
+    document.getElementById("wrongGuess").innerHTML = "Wrong guesses: " + wrongGuess.join('');
+    document.getElementById("guessesLeft").innerHTML = "Guesses remaining: " + guessBomb;
+}
+
+function gameLose() {
+    document.getElementById('mainGame').style.display = 'none';
+    document.getElementById('RRguess').style.display = 'none';
+    document.getElementById('youLose').style.display = 'block';
+    document.getElementById("correctWordWas").innerHTML = "The correct word was " + word;
+}
+
+function gameWin() {
+    document.getElementById('mainGame').style.display = 'none';
+    document.getElementById('RRguess').style.display = 'none';
+    document.getElementById('youWin').style.display = 'block';
+}
+
+function restart() {
+    document.getElementById('mainGame').style.display = 'none';
+    document.getElementById('RRguess').style.display = 'none';
+    document.getElementById('youLose').style.display = 'none';
+    document.getElementById('youWin').style.display = 'none';
+    document.getElementById('chooseDifficulty').style.display = 'block';
+
+    word = "";
+    wordGuess = [];
+    wrongGuess = [];
+    guessBomb = 0;
+    winCount = 1;
+    dif = 0;
+} </scriptt>
